@@ -1,15 +1,13 @@
-
-import './App.css'
-import LogAnalyzerPage from './pages/LogAnalyzerPage'
+import "./App.css";
+import React from "react";
+import LogUploader from "./components/LogUploader";
 
 function App() {
-  
-
   return (
-    <>
-       <LogAnalyzerPage />
-    </>
-  )
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <LogUploader />
+    </div>
+  );
 }
 
-export default App
+export default App;
