@@ -14,6 +14,15 @@ const UserPage = () => {
   const [logLevel, setLogLevel] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
+  const [logsPerPage, setLogsPerPage] = useState(10); // default: 10
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Calculate current page logs
+  const indexOfLastLog = currentPage * logsPerPage;
+  const indexOfFirstLog = indexOfLastLog - logsPerPage;
+  const currentLogs = filteredData.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(filteredData.length / logsPerPage);
+
   // ✅ Move this up before handleFilter
   const formatDate = (inputDate) => {
     if (!inputDate) return "";
@@ -149,6 +158,28 @@ const UserPage = () => {
 
           {filteredData.length > 0 && (
             <div className="overflow-x-auto mt-4">
+              {/* Logs Per Page Selector */}
+              <div className="flex justify-end items-center mb-2 text-sm">
+                <label htmlFor="logsPerPage" className="mr-2 text-white">
+                  Logs per page:
+                </label>
+                <select
+                  id="logsPerPage"
+                  value={logsPerPage}
+                  onChange={(e) => {
+                    setLogsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="p-1 rounded text-black"
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+
+              {/* Table */}
               <table className="min-w-full text-sm text-left text-white">
                 <thead className="bg-slate-700 text-sky-300">
                   <tr>
@@ -156,15 +187,46 @@ const UserPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredData.map((line, idx) => (
+                  {currentLogs.map((line, idx) => (
                     <tr key={idx} className="hover:bg-slate-700">
-                      <td className="px-4 py-2 border-t border-slate-600">
+                      <td className="px-4 py-2 border-t border-slate-600 whitespace-pre-wrap">
                         {line}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center mt-4 text-sm text-white">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                    currentPage === 1
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
+                >
+                  Previous
+                </button>
+
+                <span className="text-sky-400">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                    currentPage === totalPages || totalPages === 0
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
