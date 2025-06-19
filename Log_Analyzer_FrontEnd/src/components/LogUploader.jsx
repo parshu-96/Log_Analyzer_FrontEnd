@@ -58,8 +58,8 @@ const LogUploader = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 mt-10 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-xl rounded-2xl">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white text-center">
+    <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-xl rounded-2xl border">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Upload Log File
       </h2>
 
@@ -72,19 +72,18 @@ const LogUploader = () => {
       />
 
       {selectedType && (
-        <div className="mt-6">
+        <>
           <FileDropZone setFile={setFile} />
-
           {file && (
-            <div className="mt-4 text-green-600 dark:text-green-400 font-medium text-sm">
-              Selected File: <span className="font-semibold">{file.name}</span>
+            <div className="mb-4 text-green-600">
+              Uploaded File: <strong>{file.name}</strong>
             </div>
           )}
 
           <button
             onClick={handleUpload}
             disabled={!file || uploading}
-            className={`mt-6 w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 shadow ${
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
               uploading || !file
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"
@@ -92,19 +91,11 @@ const LogUploader = () => {
           >
             {uploading ? "Uploading..." : "Upload"}
           </button>
-        </div>
+        </>
       )}
 
       {message && (
-        <div
-          className={`mt-6 text-sm text-center font-medium ${
-            message.includes("failed")
-              ? "text-red-500"
-              : "text-blue-600 dark:text-blue-400"
-          }`}
-        >
-          {message}
-        </div>
+        <div className="mt-4 text-sm text-blue-700 font-medium">{message}</div>
       )}
 
       {/* Matched Patterns Section */}
