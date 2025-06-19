@@ -1,83 +1,157 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import admindashlogo from "./../assets/AdminDashboardLogo.png"; // Adjust the path as necessary
 
 const AdminDashboard = () => {
-  const [logTypes, setLogTypes] = useState([
-    "Authentication Logs",
-    "System Errors",
-  ]);
+  const [logTypes, setLogTypes] = useState([]);
   const [showLogTypeForm, setShowLogTypeForm] = useState(false);
   const [newLogType, setNewLogType] = useState("");
   const [selectedLogType, setSelectedLogType] = useState(null);
-  const [entries, setEntries] = useState({
-    "Authentication Logs": [
-      {
-        logLine: "Failed login attempt for user 'admin'",
-        solution: "Check credentials and unlock account.",
-      },
-    ],
-    "System Errors": [],
-  });
+  const [entries, setEntries] = useState({});
   const [logLine, setLogLine] = useState("");
   const [solution, setSolution] = useState("");
   const [editIndex, setEditIndex] = useState(null);
 
-  const handleAddLogType = () => {
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/logfiles/filenames")
+      .then((res) => {
+        const names = res.data.filenames.map((f) => f.name);
+        setLogTypes(names);
+        /*const initialEntries = {};
+        names.forEach((name) => {
+          initialEntries[name] = [];
+        });
+        setEntries(initialEntries);*/
+      })
+      .catch((err) => console.error("Failed to load log types", err));
+  }, []);
+
+  const handleAddLogType = async () => {
     if (!newLogType.trim()) return;
     if (logTypes.includes(newLogType)) return alert("Log type already exists.");
-    setLogTypes([...logTypes, newLogType]);
-    setEntries({ ...entries, [newLogType]: [] });
-    setNewLogType("");
-    setShowLogTypeForm(false);
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/logfiles", {
+        name: newLogType,
+      });
+
+      const createdName = response.data.fileType.name;
+      setLogTypes([...logTypes, createdName]);
+      //setEntries({ ...entries, [createdName]: [] });
+      setEntries((prev) => ({ ...prev, [createdName]: [] }));
+      setNewLogType("");
+      setShowLogTypeForm(false);
+    } catch (error) {
+      console.error("Failed to add log type", error);
+      alert("Error adding log type");
+    }
   };
 
-  const handleBlockClick = (type) => {
+  const handleBlockClick = async (type) => {
     setSelectedLogType(type);
     setLogLine("");
     setSolution("");
     setEditIndex(null);
     setShowLogTypeForm(false);
+
+    try {
+      /*const response = await axios.get(
+        `http://localhost:5000/api/logfiles/patterns/${type}`
+      );
+      const patterns = response.data.map((item) => ({
+        logLine: item.matchLine,
+        solution: item.resolutionSteps,
+      }));
+      setEntries((prev) => ({ ...prev, [type]: patterns }));*/
+
+      axios
+        .get(`http://localhost:5000/api/logfiles/patterns/${type}`)
+        .then((res) => {
+          setEntries((prev) => ({ ...prev, [type]: res.data }));
+        })
+        .catch((err) => alert("Error loading patterns"));
+    } catch (error) {
+      console.error("Failed to load log patterns", error);
+    }
   };
 
   const handleDeleteLogType = (type) => {
     if (window.confirm(`Delete log type "${type}"?`)) {
-      const updatedTypes = logTypes.filter((t) => t !== type);
-      const updatedEntries = { ...entries };
-      delete updatedEntries[type];
-      setLogTypes(updatedTypes);
-      setEntries(updatedEntries);
-      if (selectedLogType === type) {
-        setSelectedLogType(null);
+      axios
+        .delete(`http://localhost:5000/api/logfiles/${type}`)
+        .then(() => {
+          const updatedTypes = logTypes.filter((t) => t !== type);
+          const updatedEntries = { ...entries };
+          delete updatedEntries[type];
+          setLogTypes(updatedTypes);
+          setEntries(updatedEntries);
+          if (selectedLogType === type) {
+            setSelectedLogType(null);
+          }
+        })
+        .catch((err) => alert("Error deleting log type"));
+    }
+  };
+
+  const handleAddEntry = async () => {
+    if (!logLine.trim() || !solution.trim()) return;
+    //const newEntry = { logLine, solution };
+    //const updated = [...(entries[selectedLogType] || [])];
+    const data = {
+      matchLine: logLine,
+      resolutionSteps: solution,
+    };
+
+    if (editIndex !== null) {
+      try {
+        const id = entries[selectedLogType][editIndex]._id;
+        axios
+          .put(`http://localhost:5000/api/logfiles/patterns/${id}`, data)
+          .then((res) => {
+            const updated = [...entries[selectedLogType]];
+            updated[editIndex] = res.data.data;
+            setEntries({ ...entries, [selectedLogType]: updated });
+            setLogLine("");
+            setSolution("");
+            setEditIndex(null);
+          });
+      } catch (error) {
+        console.error("Failed to save log entry", error);
+      }
+    } else {
+      try {
+        axios
+          .post("http://localhost:5000/api/logfiles/patterns", {
+            logFileType: selectedLogType,
+            entries: [data],
+          })
+          .then((res) => {
+            handleBlockClick(selectedLogType);
+            setLogLine("");
+            setSolution("");
+          });
+      } catch (error) {
+        console.error("Failed to save log entry", error);
       }
     }
   };
 
-  const handleAddEntry = () => {
-    if (!logLine.trim() || !solution.trim()) return;
-    const newEntry = { logLine, solution };
-    const updated = [...(entries[selectedLogType] || [])];
-
-    if (editIndex !== null) {
-      updated[editIndex] = newEntry;
-    } else {
-      updated.push(newEntry);
-    }
-
-    setEntries({ ...entries, [selectedLogType]: updated });
-    setLogLine("");
-    setSolution("");
-    setEditIndex(null);
-  };
-
   const handleDelete = (index) => {
-    const updated = entries[selectedLogType].filter((_, i) => i !== index);
-    setEntries({ ...entries, [selectedLogType]: updated });
+    const id = entries[selectedLogType][index]._id;
+    axios
+      .delete(`http://localhost:5000/api/logfiles/patterns/${id}`)
+      .then(() => {
+        const updated = entries[selectedLogType].filter((_, i) => i !== index);
+        setEntries({ ...entries, [selectedLogType]: updated });
+      })
+      .catch((err) => alert("Error deleting entry"));
   };
 
   const handleEdit = (index) => {
     const entry = entries[selectedLogType][index];
-    setLogLine(entry.logLine);
-    setSolution(entry.solution);
+    setLogLine(entry.matchLine);
+    setSolution(entry.resolutionSteps);
     setEditIndex(index);
   };
 
@@ -144,7 +218,7 @@ const AdminDashboard = () => {
               <h2 className="text-lg font-semibold">{type}</h2>
               {selectedLogType === type && (
                 <div className="flex gap-2">
-                  <button
+                  {/* <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleBlockClick(type);
@@ -152,7 +226,7 @@ const AdminDashboard = () => {
                     className="bg-sky-600 text-white text-xs px-3 py-1 rounded hover:bg-sky-500"
                   >
                     Edit
-                  </button>
+                  </button> */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -221,10 +295,10 @@ const AdminDashboard = () => {
                     {idx + 1}
                   </td>
                   <td className="px-4 py-2 border border-slate-700">
-                    {entry.logLine}
+                    {entry.matchLine}
                   </td>
                   <td className="px-4 py-2 border border-slate-700">
-                    {entry.solution}
+                    {entry.resolutionSteps}
                   </td>
                   <td className="px-4 py-2 border border-slate-700 space-x-2">
                     <button
