@@ -30,6 +30,16 @@ const UserPage = () => {
     return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy
   };
 
+  const resetAnalysisAndFilter = () => {
+    setShowAnalyzeButton(false);
+    setShowRcaTable(false);
+    setRcaData([]);
+    setFilteredData([]);
+    setStartDate("");
+    setEndDate("");
+    setLogLevel("");
+  };
+
   const handleFileUploadSuccess = () => {
     setShowAnalyzeButton(true);
     setShowRcaTable(false);
@@ -70,6 +80,7 @@ const UserPage = () => {
         <LogUploader
           onSuccess={handleFileUploadSuccess}
           onUploadComplete={setRcaData}
+          onFileTypeChange={resetAnalysisAndFilter}
         />
       </div>
 

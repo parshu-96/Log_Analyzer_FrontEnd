@@ -3,7 +3,7 @@ import axios from "axios";
 import FileTypeDropdown from "./FileTypeDropDown";
 import FileDropZone from "./FileDropZone";
 
-const LogUploader = ({ onSuccess, onUploadComplete }) => {
+const LogUploader = ({ onSuccess, onUploadComplete, onFileTypeChange }) => {
   const [fileTypes, setFileTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState(null);
@@ -63,6 +63,7 @@ const LogUploader = ({ onSuccess, onUploadComplete }) => {
         setSelectedType={setSelectedType}
         setFile={setFile}
         setMessage={setMessage}
+        onFileTypeChange={onFileTypeChange}
       />
 
       {selectedType && (

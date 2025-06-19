@@ -6,6 +6,7 @@ const FileTypeDropdown = ({
   setSelectedType,
   setFile,
   setMessage,
+  onFileTypeChange,
 }) => {
   if (!fileTypes || fileTypes.length === 0) {
     return (
@@ -30,6 +31,9 @@ const FileTypeDropdown = ({
           setSelectedType(e.target.value);
           setFile(null);
           setMessage("");
+          if (typeof onFileTypeChange === "function") {
+            onFileTypeChange(); // reset everything in parent
+          }
         }}
         className="w-full px-4 py-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
