@@ -3,7 +3,7 @@ import axios from "axios";
 import FileTypeDropdown from "./FileTypeDropDown";
 import FileDropZone from "./FileDropZone";
 
-const LogUploader = () => {
+const LogUploader = ({ onSuccess, onUploadComplete }) => {
   const [fileTypes, setFileTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState(null);
@@ -39,6 +39,10 @@ const LogUploader = () => {
         formData
       );
       setMessage(res.data.message || "Upload successful!");
+      if (typeof onSuccess === "function") onSuccess();
+      if (typeof onUploadComplete === "function" && Array.isArray(res.data)) {
+        onUploadComplete(res.data);
+      }
     } catch (err) {
       console.error(err);
       setMessage("Upload failed. Please try again.");
