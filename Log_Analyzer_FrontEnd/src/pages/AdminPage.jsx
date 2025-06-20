@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import admindashlogo from "./../assets/AdminDashboardLogo.png"; // Adjust the path as necessary
 
@@ -159,13 +160,16 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-gray-950 text-white p-6">
       {/* Logo / Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="bg-sky-600 rounded-full p-3">
+        <Link
+          to="/"
+          className="bg-sky-600 rounded-full p-3 hover:opacity-80 transition"
+        >
           <img
             src={admindashlogo}
             alt="Logo"
             className="h-10 w-10 object-contain"
           />
-        </div>
+        </Link>
         <h1 className="text-4xl font-extrabold text-white">
           Log Admin Dashboard
         </h1>
@@ -245,7 +249,7 @@ const AdminDashboard = () => {
 
       {/* Log Entry Form */}
       {selectedLogType && (
-        <div className="bg-slate-800 rounded-lg p-6 mb-8 shadow-md max-w-2xl">
+        <div className="bg-slate-800 rounded-lg p-6 mb-8 shadow-md w-full">
           <h2 className="text-xl font-semibold mb-4 text-sky-400">
             Add Entry for <span className="text-white">{selectedLogType}</span>
           </h2>
@@ -276,7 +280,7 @@ const AdminDashboard = () => {
 
       {/* Table */}
       {selectedLogType && entries[selectedLogType]?.length > 0 && (
-        <div className="overflow-x-auto max-w-4xl bg-slate-800 rounded-lg shadow-md">
+        <div className="overflow-x-auto w-full bg-slate-800 rounded-lg shadow-md">
           <table className="min-w-full text-sm text-white">
             <thead className="bg-slate-700">
               <tr>
@@ -300,19 +304,21 @@ const AdminDashboard = () => {
                   <td className="px-4 py-2 border border-slate-700">
                     {entry.resolutionSteps}
                   </td>
-                  <td className="px-4 py-2 border border-slate-700 space-x-2">
-                    <button
-                      onClick={() => handleEdit(idx)}
-                      className="text-sky-400 hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(idx)}
-                      className="text-rose-400 hover:underline"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-2 border border-slate-700">
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => handleEdit(idx)}
+                        className="text-sky-400 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(idx)}
+                        className="text-rose-400 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

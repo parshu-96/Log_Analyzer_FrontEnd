@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import LogUploader from "../components/LogUploader";
 import userdashlogog from "../assets/UserDashboardLogo.png";
 import axios from "axios";
@@ -66,13 +67,23 @@ const UserPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-gray-950 text-white p-6">
       <div className="flex items-center gap-4 mb-8">
-        <div className="bg-sky-600 rounded-full p-3">
+        {/* <div className="bg-sky-600 rounded-full p-3">
           <img
             src={userdashlogog}
             alt="Logo"
             className="h-10 w-10 object-contain"
           />
-        </div>
+        </div> */}
+        <Link
+          to="/"
+          className="bg-sky-600 rounded-full p-3 hover:opacity-80 transition"
+        >
+          <img
+            src={userdashlogog}
+            alt="Logo"
+            className="h-10 w-10 object-contain"
+          />
+        </Link>
         <h1 className="text-4xl font-extrabold text-white">User Dashboard</h1>
       </div>
 
