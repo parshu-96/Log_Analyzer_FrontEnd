@@ -286,6 +286,7 @@ const AdminDashboard = () => {
               <tr>
                 <th className="px-4 py-3 border border-slate-700">#</th>
                 <th className="px-4 py-3 border border-slate-700">Log Line</th>
+                <th className="px-4 py-3 border border-slate-700">Count</th>
                 <th className="px-4 py-3 border border-slate-700">
                   Probable Solution
                 </th>
@@ -300,6 +301,9 @@ const AdminDashboard = () => {
                   </td>
                   <td className="px-4 py-2 border border-slate-700">
                     {entry.matchLine}
+                  </td>
+                  <td className="px-4 py-2 border border-slate-700">
+                    {entry.matchCount ?? 0}
                   </td>
                   <td className="px-4 py-2 border border-slate-700">
                     {entry.resolutionSteps}
